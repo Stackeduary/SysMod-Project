@@ -1,0 +1,22 @@
+@startuml
+actor       User       as user
+participant "Controller\n(TransactionController)" as con
+participant "Service\n(TransactionService)" as ser
+participant "Repository\n(TransactionRepository)" as rep
+database    Database    as db
+user -> con : DELETE /customers/{customerId}/transactions/{transactionId}  
+con -> ser : cancelTransaction(TransactionDto transaction)
+ser -> ser : checkTransactionType(TransactionDto transaction)
+ser -> ser : checkTimeConstraint(DateTime transactionDate)
+alt more than 10 minutes OR non-cancellable transaction type
+ser -> con : reject()
+con -> user : Rejection Message
+else \t\t\t\t\t\t\t less than or equal 10 minutes
+ser -> rep : updateTransactionStatus(String transactionId, TransactionStatus status)
+rep -> db : query
+rep <- db : result
+rep -> ser : true
+con <- ser : Success message
+user <- con : Success message
+end
+@enduml

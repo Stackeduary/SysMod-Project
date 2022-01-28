@@ -1,0 +1,14 @@
+@startuml
+left to right direction
+actor "Bank Employee" as fc
+rectangle CancelTransactionSystem {
+  usecase "Select transaction to cancel" as UC1
+  usecase "Check if the cancellation deadline is passed" as UC2
+  usecase "Mark as cancelled" as UC3
+  usecase "Refund the amount to sender" as UC4
+  UC1 .> UC2 : include
+  UC2 .> UC3 : include
+}
+fc --> UC1
+fc --> UC4
+@enduml

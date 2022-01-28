@@ -1,0 +1,51 @@
+	
+@startuml
+actor       Actor       as user
+participant "Controller\n(TransactionController)" as con
+participant "Service\n(TransactionService)" as ser
+participant "Repository\n(TransactionRepository)" as rep
+database    Database    as db
+user -> con : POST /customers/{customerId}/transactions/{transactionId}  
+con -> ser : modifyTransaction(TransactionDto transaction)
+ser -> ser : checkTransactionType(TransactionDto transaction)
+alt TRANSFER
+ser -> ser : checkTimeConstraint(DateTime transactionDate)
+end
+alt \t\t\t\t\t\t\t more than 10 minutes
+ser -> con : reject()
+end
+con -> user : Rejection Message
+alt less than or equal 10 minutes
+ser -> ser : cancelOldTransaction(String transactionId)
+ser -> rep : updateTransactionStatus(String transactionId, TransactionStatus status)
+rep -> db : query
+rep <- db : result
+rep -> ser : true
+ser -> ser : createNewTransaction(TransactionDto transaction)
+ser -> rep : save(Transaction transaction)
+rep -> db : query
+rep <- db : result
+ser <- rep : TransactionObject
+end
+con <- ser : Success message
+user <- con : Success message
+
+alt DEPOSIT
+ser -> ser : cancelOldTransaction(String transactionId)
+ser -> rep : updateTransactionStatus(String transactionId, TransactionStatus status)
+rep -> db : query
+rep <- db : result
+rep -> ser : true
+ser -> ser : createNewTransaction(TransactionDto transaction)
+ser -> rep : save(Transaction transaction)
+rep -> db : query
+rep <- db : result
+ser <- rep : TransactionObject
+end
+con <- ser : Success message
+user <- con : Success message
+alt ELSE TRANSACTION TYPES
+con <- ser : reject()
+end
+con -> user : Rejection Message
+@enduml

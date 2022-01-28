@@ -1,0 +1,167 @@
+@startuml SystemModellingProject
+
+abstract class BaseEntity {
+    createdDate: Date
+    createdBy: User
+    modifiedDate: Date
+    modifiedBy: User
+    version: String
+}
+
+class Bank {
+    - id: Long
+    - name: String
+    - address: String
+    - physicalAmount: Double
+    - virtualAmount: Double
+    --
+    + updateVirtualAmount (amount)
+    + updatePhysicalAmount (amount)
+}
+
+' Bank --|> BaseEntity
+
+class Branch {
+    - id: Long
+    - name: String
+    - address: String
+}
+
+Branch --|> BaseEntity
+
+class Employee {
+    - id: Long
+    - username: String
+    - password: String
+    - name: String
+    - dateOfBirth: Date
+    - status: UserStatus
+    - email: String
+    - attempts: Int
+    --
+    + saveAttempts (employeeId)
+    + resetAttempts (employeeId)
+}
+
+Employee --|> BaseEntity
+
+class Customer {
+    - id: Long
+    - fullname: String
+    - dateOfBirth: Date
+    - address: String
+    - phoneNumber: String
+    - identificationNo: String
+    - username: String
+    - password: String
+    - status: UserStatus
+    - email: String
+    - sex: Sex
+    - pin: Int
+    - loginAttemps: Int
+    --
+    + saveAttempts (customerId)
+    + resetAttempts (customerId)
+    + createCustomer (customer)
+    + editCustomer (customer)
+    + blockProfile (profileId)
+    + unblockProfile (profileId)
+}
+
+Customer --|> BaseEntity
+
+class Account {
+    - id: Long
+    - name: String
+    - accountNo: String
+    - openDate: Date
+    - totalAmount: Double
+    - availableAmount: Double
+    - type: AccountType
+    - status: AccountType
+    - IBAN: String
+    --
+    + createAccount(account)
+    + deleteAccount(account)
+}
+
+Account --|> BaseEntity
+
+class Transaction {
+    - id: Long
+    - type: TransactionType
+    - amount: Double
+    - date: Date
+    - status: TransactionStatus
+    - message: String
+    - recipent: Account
+    --
+    + deposit (transaction)
+    + withdraw (transaction)
+    + transfer (transaction)
+    + cancelTransaction (transaction)
+    + modifyTransaction (transaction)
+}
+
+Transaction --|> BaseEntity
+
+class UserRole {
+    - id: Long
+    - userRole: UserRole
+    --
+    + addRole(userId, roleId)
+    + removeRole(userId, roleId)
+}
+
+UserRole --|> BaseEntity
+
+enum UserStatus <<Enumeration>> {
+    ACTIVE
+    INACTIVE
+    BLOCKED
+}
+
+enum TransactionType <<Enumeration>> {
+    WITHDRAW
+    DEPOSIT
+    TRANSFER
+}
+
+enum TransactionStatus <<Enumeration>> {
+    SUCCESS
+    FAILED
+    PENDING
+    HOLD
+    CANCELED
+}
+
+enum UserRoles <<Enumeration>> {
+    ADMIN
+    MANAGER
+    CUSTOMER
+}
+
+enum AccountType <<Enumeration>> {
+    SAVINGS
+    JOINT
+}
+
+enum AccountStatus <<Enumeration>> {
+    ACTIVE
+    INACTIVE
+    BLOCKED
+}
+
+enum Sex <<Enumeration>> {
+    FEMALE
+    MALE
+}
+
+Employee "many" *-- "1" Branch
+Account "many" *-- "1" Branch
+Account "1" -- "1" Customer
+Account "1" --* "many" Transaction
+Branch "many" *-- "1" Bank
+Customer "1" --* "many" Transaction
+Customer "many" *--* "many" UserRole
+Employee "many" *--* "many" UserRole

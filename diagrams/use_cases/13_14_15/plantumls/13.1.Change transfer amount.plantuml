@@ -1,0 +1,18 @@
+@startuml
+left to right direction
+actor "Bank Employee" as fc
+rectangle ModifyTransactionSystem {
+  usecase "Select transaction done at max 10 minutes ago" as UC1
+  usecase "Change amount field" as UC2
+  usecase "Save transaction" as UC3
+  usecase "Cancel previous transaction" as UC4
+  usecase "Create new transaction with new amount and previous details" as UC5
+  UC1 .> UC2 : include
+  UC2 .> UC3 : include
+  UC5 .> UC4 : include
+  UC3 .> UC5 : include
+}
+fc --> UC1
+fc --> UC2
+fc --> UC3
+@enduml

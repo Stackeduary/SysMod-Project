@@ -1,0 +1,27 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor "Admin" as admin
+rectangle TransactionLogs {
+    usecase "Login" as login
+    usecase "Searches user by the customer's govermental ID as search" as search
+    usecase "The customer's govermental ID is correct" as happy
+    usecase "The customer's govermental ID is wrong" as sad
+    usecase "No transactions found" as 404
+    usecase "Fetch transactions of customer" as fetch_data
+    usecase "Show transactions of customer" as show_data
+
+    login <. search : <<include>>
+    fetch_data <. 404 :<<extend>>
+    search <. sad : <<extend>>
+    
+
+}
+actor "Server" as server
+
+admin -- login
+server -- fetch_data
+search -- happy
+fetch_data -- show_data
+happy -- show_data
+sad -- 404
